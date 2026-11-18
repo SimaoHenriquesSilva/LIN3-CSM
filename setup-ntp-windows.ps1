@@ -2,8 +2,8 @@
 # À lancer dans PowerShell en administrateur :
 #   Set-ExecutionPolicy -Scope Process Bypass; .\setup-ntp-windows.ps1
 
-$IpDebian = "10.229.38.170"
-$Reseau   = "10.229.0.0/16"
+$IpDebian = "10.0.3.10"
+$Reseau   = "10.0.0.0/16"
 
 # Sources : Debian en priorité, pool suisse en secours (0x8 = mode client normal)
 w32tm /config /manualpeerlist:"$IpDebian,0x8 ch.pool.ntp.org,0x8" /syncfromflags:manual /reliable:yes /update
