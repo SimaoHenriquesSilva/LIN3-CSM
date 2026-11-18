@@ -1,4 +1,15 @@
 #!/bin/bash
+HOST=NTP-SRV-LIN
+
+# Hostname (+ /etc/hosts, + cloud-init pour que ça survive au reboot)
+[ "$(hostname)" = $HOST ] || hostnamectl set-hostname $HOST
+grep -q "^127.0.1.1 $HOST\$" /etc/hosts || { sed -i '/^127.0.1.1/d' /etc/hosts; echo "127.0.1.1 $HOST" >> /etc/hosts; }
+[ -d /etc/cloud/cloud.cfg.d ] && echo 'preserve_hostname: true' > /etc/cloud/cloud.cfg.d/99-hostname.cfg
+
+# Sous-réseau local (auto-détecté)
+IF=$(ip -4 route show default | awk '{print $5; exit}')
+SUBNET=$(ip -4 route show dev "$IF" proto kernel scope link | awk '{print $1; exit}')
+[ -n "$SUBNET" ] || { echo "Sous-réseau introuvable"; exit 1; }
 
 # Fuseau
 [ "$(timedatectl show -p Timezone --value)" = Europe/Zurich ] || timedatectl set-timezone Europe/Zurich
@@ -11,13 +22,9 @@ pool ch.pool.ntp.org maxsources 2
 driftfile /var/lib/chrony/chrony.drift
 makestep 1 3
 rtcsync
-allow 10.229.32.0/20
+allow $SUBNET
 logdir /var/log/chrony
 log tracking measurements statistics
 EOF
 cmp -s /tmp/chrony.new /etc/chrony/chrony.conf || { cp /tmp/chrony.new /etc/chrony/chrony.conf; systemctl restart chrony; }
 systemctl enable chrony >/dev/null 2>&1
-
-# Pare-feu (seulement si ufw est actif)
-ufw status 2>/dev/null | grep -q "Status: active" && ufw allow from 10.229.32.0/20 to any port 123 proto udp
-true
