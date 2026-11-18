@@ -28,3 +28,15 @@ log tracking measurements statistics
 EOF
 cmp -s /tmp/chrony.new /etc/chrony/chrony.conf || { cp /tmp/chrony.new /etc/chrony/chrony.conf; systemctl restart chrony; }
 systemctl enable chrony >/dev/null 2>&1
+
+# Vérifications
+echo "=== Hostname ===";        hostname
+echo "=== Service chrony ===";  systemctl is-active chrony; systemctl is-enabled chrony
+echo "=== Config ===";          grep -vE '^\s*(#|$)' /etc/chrony/chrony.conf
+echo "=== iburst (vide = OK) ==="; grep iburst /etc/chrony/chrony.conf
+echo "=== Fuseau ===";          timedatectl | grep -E "Time zone|synchronized"
+echo "=== Écoute UDP 123 ===";  ss -ulpn | grep ':123'
+echo "=== Sources ===";         chronyc sources
+echo "=== Tracking ===";        chronyc tracking | grep -E "Reference ID|Stratum|System time|Leap status"
+echo "=== Clients ===";         chronyc clients
+true
