@@ -8,12 +8,11 @@ $Reseau   = "10.229.0.0/16"
 # Sources : Debian en priorité, pool suisse en secours (0x8 = mode client normal)
 w32tm /config /manualpeerlist:"$IpDebian,0x8 ch.pool.ntp.org,0x8" /syncfromflags:manual /reliable:yes /update
 
-# Activer le serveur NTP et l'annonce
+# Active le serveur NTP de Windows (Enabled = 1) : sans ça, Windows ne répond pas aux requêtes des clients
 Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\W32Time\TimeProviders\NtpServer" -Name Enabled -Value 1
+# AnnounceFlags = 5 : Windows s'annonce comme source de temps fiable (1 = toujours annoncé, 4 = temps fiable)
 Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\W32Time\Config" -Name AnnounceFlags -Value 5
 
-# Interrogation toutes les 5 minutes
-Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\W32Time\TimeProviders\NtpClient" -Name SpecialPollInterval -Value 300
 
 # Pare-feu : UDP 123 entrant (sans ça, Windows ne répond pas aux clients)
 if (-not (Get-NetFirewallRule -DisplayName "NTP Server UDP 123" -ErrorAction SilentlyContinue)) {
