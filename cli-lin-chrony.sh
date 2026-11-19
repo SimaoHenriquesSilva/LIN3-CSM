@@ -3,8 +3,8 @@ set -e
 
 cat > /etc/chrony/chrony.conf <<'EOF'
 # Fichier de configuration Chrony
-server 10.0.3.10 prefer iburst maxpoll 6
-server 10.0.3.11 iburst maxpoll 6
+server 10.0.3.10 prefer iburst minpoll 5 maxpoll 5
+server 10.0.3.11 iburst minpoll 5 maxpoll 5
 driftfile /var/lib/chrony/chrony.drift
 makestep 1 3
 rtcsync
