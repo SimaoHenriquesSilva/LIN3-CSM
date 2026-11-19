@@ -1,5 +1,12 @@
 #!/bin/bash
+
+# ===== À MODIFIER SELON LE SITE =====
 HOST=NTP-SRV-LIN
+TZ_NAME=Europe/Dublin                  # fuseau du serveur
+NTP_SERVERS="169.254.169.123"          # serveur(s) le plus proche (préféré), séparés par des espaces
+NTP_POOL="pool.ntp.org"                # pool DNS : chrony choisit les meilleures sources
+POOL_MAX=4                             # nombre de sources prises dans le pool
+# ====================================
 
 # Hostname (+ /etc/hosts, + cloud-init pour que ça survive au reboot)
 [ "$(hostname)" = $HOST ] || hostnamectl set-hostname $HOST
@@ -12,13 +19,14 @@ SUBNET=$(ip -4 route show dev "$IF" proto kernel scope link | awk '{print $1; ex
 [ -n "$SUBNET" ] || { echo "Sous-réseau introuvable"; exit 1; }
 
 # Fuseau
-[ "$(timedatectl show -p Timezone --value)" = Europe/Zurich ] || timedatectl set-timezone Europe/Zurich
+[ "$(timedatectl show -p Timezone --value)" = "$TZ_NAME" ] || timedatectl set-timezone "$TZ_NAME"
 
 # Chrony
 dpkg -s chrony >/dev/null 2>&1 || { apt-get update && apt-get install -y chrony; } || exit 1
-cat > /tmp/chrony.new <<EOF
-server ntp11.metas.ch
-pool ch.pool.ntp.org maxsources 2
+{
+  for S in $NTP_SERVERS; do echo "server $S prefer"; done
+  echo "pool $NTP_POOL maxsources $POOL_MAX"
+  cat <<EOF
 driftfile /var/lib/chrony/chrony.drift
 makestep 1 3
 rtcsync
@@ -26,6 +34,7 @@ allow $SUBNET
 logdir /var/log/chrony
 log tracking measurements statistics
 EOF
+} > /tmp/chrony.new
 cmp -s /tmp/chrony.new /etc/chrony/chrony.conf || { cp /tmp/chrony.new /etc/chrony/chrony.conf; systemctl restart chrony; }
 systemctl enable chrony >/dev/null 2>&1
 
