@@ -29,6 +29,9 @@ EOF
 cmp -s /tmp/chrony.new /etc/chrony/chrony.conf || { cp /tmp/chrony.new /etc/chrony/chrony.conf; systemctl restart chrony; }
 systemctl enable chrony >/dev/null 2>&1
 
+# tcpdump
+dpkg -s tcpdump >/dev/null 2>&1 || { apt-get update && apt-get install -y tcpdump; } || exit 1
+
 # Vérifications
 echo "=== Hostname ===";        hostname
 echo "=== Service chrony ===";  systemctl is-active chrony; systemctl is-enabled chrony
@@ -39,4 +42,5 @@ echo "=== Écoute UDP 123 ===";  ss -ulpn | grep ':123'
 echo "=== Sources ===";         chronyc sources
 echo "=== Tracking ===";        chronyc tracking | grep -E "Reference ID|Stratum|System time|Leap status"
 echo "=== Clients ===";         chronyc clients
+echo "=== tcpdump ===";         tcpdump --version 2>&1 | head -1
 true
