@@ -1,10 +1,11 @@
+bash
 #!/bin/bash
 
 # ===== À MODIFIER SELON LE SITE =====
 HOST=NTP-SRV-LIN
 TZ_NAME=Europe/Dublin                  # fuseau du serveur
-NTP_SERVERS="169.254.169.123"          # serveur(s) le plus proche (préféré), séparés par des espaces
-NTP_POOL="pool.ntp.org"                # pool DNS : chrony choisit les meilleures sources
+NTP_SERVERS=""                         # aucun serveur imposé
+NTP_POOL="ch.pool.ntp.org"             # pool DNS suisse
 POOL_MAX=4                             # nombre de sources prises dans le pool
 # ====================================
 
@@ -24,7 +25,7 @@ SUBNET=$(ip -4 route show dev "$IF" proto kernel scope link | awk '{print $1; ex
 # Chrony
 dpkg -s chrony >/dev/null 2>&1 || { apt-get update && apt-get install -y chrony; } || exit 1
 {
-  for S in $NTP_SERVERS; do echo "server $S prefer"; done
+  for S in $NTP_SERVERS; do echo "server $S"; done
   echo "pool $NTP_POOL maxsources $POOL_MAX"
   cat <<EOF
 driftfile /var/lib/chrony/chrony.drift
