@@ -3,8 +3,8 @@
 # ===== À MODIFIER SELON LE SITE =====
 HOST=NTP-SRV-LIN
 TZ_NAME=Europe/Dublin                  # fuseau du serveur
-NTP_SERVERS="169.254.169.123"          # serveur(s) le plus proche (préféré), séparés par des espaces
-NTP_POOL="pool.ntp.org"                # pool DNS : chrony choisit les meilleures sources
+NTP_SERVERS=""                         # serveur(s) fixe(s) préféré(s), séparés par des espaces (vide = aucun)
+NTP_POOL="ie.pool.ntp.org"             # pool irlandais : chrony choisit les meilleures sources
 POOL_MAX=4                             # nombre de sources prises dans le pool
 # ====================================
 
