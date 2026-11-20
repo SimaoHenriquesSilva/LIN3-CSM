@@ -3,8 +3,8 @@
 # ===== À MODIFIER SELON LE SITE =====
 HOST=NTP-SRV-LIN
 TZ_NAME=Europe/Dublin                  # fuseau du serveur
-NTP_SERVERS="188.125.64.7 188.125.64.6 89.234.64.77 80.93.17.197"   # 4 stratum 2 irlandais les plus proches (latence)
-NTP_POOL=""                            # vide = pas de pool (sinon on dépasserait 4 sources)
+NTP_SERVERS="ntp-galwai.hea.net"   # 4 stratum 2 irlandais les plus proches (latence)
+NTP_POOL="ie.pool.ntp.org"                            # vide = pas de pool (sinon on dépasserait 4 sources)
 POOL_MAX=4                             # nombre de sources prises dans le pool (si NTP_POOL non vide)
 # ====================================
 
