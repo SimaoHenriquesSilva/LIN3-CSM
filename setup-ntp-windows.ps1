@@ -5,8 +5,8 @@
 $IpDebian = "10.0.3.10"
 $Reseau   = "10.0.0.0/16"
 
-# Sources : Debian en priorité, pool suisse en secours (0x8 = mode client normal)
-w32tm /config /manualpeerlist:"$IpDebian,0x8 ch.pool.ntp.org,0x8" /syncfromflags:manual /reliable:yes /update
+# Sources : Debian en priorité, pool irlandais en secours (0x8 = mode client normal)
+w32tm /config /manualpeerlist:"$IpDebian,0x8 ie.pool.ntp.org,0x8" /syncfromflags:manual /reliable:yes /update
 
 # Active le serveur NTP de Windows (Enabled = 1) : sans ça, Windows ne répond pas aux requêtes des clients
 Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\W32Time\TimeProviders\NtpServer" -Name Enabled -Value 1
