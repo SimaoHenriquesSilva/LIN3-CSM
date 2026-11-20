@@ -3,13 +3,13 @@
 # ===== À MODIFIER SELON LE SITE =====
 HOST=NTP-SRV-LIN
 TZ_NAME=Europe/Dublin                  # fuseau du serveur
-NTP_SERVERS=""                         # serveur(s) fixe(s) préféré(s), séparés par des espaces (vide = aucun)
-NTP_POOL="ie.pool.ntp.org"             # pool irlandais : chrony choisit les meilleures sources
-POOL_MAX=4                             # nombre de sources prises dans le pool
+NTP_SERVERS="188.125.64.7 188.125.64.6 89.234.64.77 80.93.17.197"   # 4 stratum 2 irlandais les plus proches (latence)
+NTP_POOL=""                            # vide = pas de pool (sinon on dépasserait 4 sources)
+POOL_MAX=4                             # nombre de sources prises dans le pool (si NTP_POOL non vide)
 # ====================================
 
 # Hostname (+ /etc/hosts, + cloud-init pour que ça survive au reboot)
-[ "$(hostname)" = $HOST ] || hostnamectl set-hostname $HOST
+[ "$(hostname)" = "$HOST" ] || hostnamectl set-hostname "$HOST"
 grep -q "^127.0.1.1 $HOST\$" /etc/hosts || { sed -i '/^127.0.1.1/d' /etc/hosts; echo "127.0.1.1 $HOST" >> /etc/hosts; }
 [ -d /etc/cloud/cloud.cfg.d ] && echo 'preserve_hostname: true' > /etc/cloud/cloud.cfg.d/99-hostname.cfg
 
@@ -24,8 +24,8 @@ SUBNET=$(ip -4 route show dev "$IF" proto kernel scope link | awk '{print $1; ex
 # Chrony
 dpkg -s chrony >/dev/null 2>&1 || { apt-get update && apt-get install -y chrony; } || exit 1
 {
-  for S in $NTP_SERVERS; do echo "server $S prefer"; done
-  echo "pool $NTP_POOL maxsources $POOL_MAX"
+  for S in $NTP_SERVERS; do echo "server $S"; done
+  [ -n "$NTP_POOL" ] && echo "pool $NTP_POOL maxsources $POOL_MAX"
   cat <<EOF
 driftfile /var/lib/chrony/chrony.drift
 makestep 1 3
@@ -48,8 +48,8 @@ echo "=== Config ===";          grep -vE '^\s*(#|$)' /etc/chrony/chrony.conf
 echo "=== iburst (vide = OK) ==="; grep iburst /etc/chrony/chrony.conf
 echo "=== Fuseau ===";          timedatectl | grep -E "Time zone|synchronized"
 echo "=== Écoute UDP 123 ===";  ss -ulpn | grep ':123'
-echo "=== Sources ===";         chronyc sources
-echo "=== Tracking ===";        chronyc tracking | grep -E "Reference ID|Stratum|System time|Leap status"
+echo "=== Sources (4 attendues) ==="; chronyc sources
+echo "=== Tracking (Stratum 3 attendu) ==="; chronyc tracking | grep -E "Reference ID|Stratum|System time|Leap status"
 echo "=== Clients ===";         chronyc clients
 echo "=== tcpdump ===";         tcpdump --version 2>&1 | head -1
 true
