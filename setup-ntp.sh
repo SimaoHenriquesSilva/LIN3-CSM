@@ -2,7 +2,7 @@
 # ===== À MODIFIER SELON LE SITE =====
 HOST=NTP-SRV-LIN
 TZ_NAME=Europe/Dublin                  # fuseau horaire du serveur
-NTP_SERVERS="ntp-galway.hea.net"       # serveur(s) NTP fixe(s) irlandais (HEAnet Galway), séparés par des espaces
+NTP_SERVERS=""       
 NTP_POOL="ie.pool.ntp.org"             # pool NTP irlandais ; vide = pas de pool
 POOL_MAX=4                             # nb max de sources prises dans le pool (ignoré si NTP_POOL vide) ; total = serveurs fixes + POOL_MAX
 # ====================================
@@ -34,7 +34,7 @@ cmp -s /tmp/chrony.new /etc/chrony/chrony.conf || { cp /tmp/chrony.new /etc/chro
 systemctl enable chrony >/dev/null 2>&1
 # tcpdump
 dpkg -s tcpdump >/dev/null 2>&1 || { apt-get update && apt-get install -y tcpdump; } || exit 1
-# Nombre de sources attendu (serveurs fixes + pool)
+# Nombre de sources attendu (serveurs pool)
 NB_SRC=$(echo $NTP_SERVERS | wc -w)
 [ -n "$NTP_POOL" ] && NB_SRC=$((NB_SRC + POOL_MAX))
 # Vérifications
