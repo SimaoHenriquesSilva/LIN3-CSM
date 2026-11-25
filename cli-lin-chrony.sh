@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -e
 
+# Mise à jour du système
+apt update
+apt upgrade -y
+
 # Timezone
 timedatectl set-timezone Europe/Zurich
 
