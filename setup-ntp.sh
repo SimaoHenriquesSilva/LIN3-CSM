@@ -1,7 +1,7 @@
 #!/bin/bash
 # ===== À MODIFIER SELON LE SITE =====
 HOST=NTP-SRV-LIN
-TZ_NAME=Europe/Dublin                  # fuseau horaire du serveur
+TZ_NAME=Europe/Zurich                  # fuseau horaire du serveur
 NTP_SERVERS=""       
 NTP_POOL="ie.pool.ntp.org"             # pool NTP irlandais ; vide = pas de pool
 POOL_MAX=4                             # nb max de sources prises dans le pool (ignoré si NTP_POOL vide) ; total = serveurs fixes + POOL_MAX
