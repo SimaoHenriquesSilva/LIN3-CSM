@@ -12,7 +12,7 @@ $Clients  = @("10.0.0.10", "10.0.0.12")
 Set-TimeZone -Id "W. Europe Standard Time"
 
 # Sources : Debian en priorité, pool irlandais en secours (0x8 = mode client normal)
-w32tm /config /manualpeerlist:"$IpDebian,0x8 ie.pool.ntp.org,0x8" /syncfromflags:manual /reliable:yes /update
+w32tm /config /manualpeerlist:"$IpDebian,0x8 ie.pool.ntp.org,0xa" /syncfromflags:manual /reliable:yes /update
 
 # Activation du serveur NTP Windows
 Set-ItemProperty `
