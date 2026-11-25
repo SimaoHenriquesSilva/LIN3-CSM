@@ -5,9 +5,6 @@
 $IpDebian = "10.0.3.10"
 $Reseau   = "10.0.0.0/16"
 
-# IP des clients autorisés à interroger Windows quand il prend le relais
-$Clients  = @("10.0.0.10", "10.0.0.12")
-
 # Fuseau horaire : Suisse (Berne, "W. Europe Standard Time" = UTC+1, heure d'été automatique)
 Set-TimeZone -Id "W. Europe Standard Time"
 
@@ -25,11 +22,10 @@ Set-ItemProperty `
     -Name AnnounceFlags -Value 5
 
 
-# Pare-feu : UDP 123 entrant, uniquement pour les clients autorisés
-# (sans règle, Windows ne répond pas ; toute autre IP est bloquée par défaut)
-if ($Clients.Count -gt 0) { $Autorises = $Clients } else { $Autorises = $Reseau }
+# Pare-feu : UDP 123 entrant, uniquement pour les machines du réseau $Reseau
+# (sans règle, Windows ne répond pas ; toute IP hors du réseau est bloquée par défaut)
 
-# On recrée la règle pour appliquer la liste à jour
+# On recrée la règle pour appliquer le réseau à jour
 Get-NetFirewallRule -DisplayName "NTP Server UDP 123" -ErrorAction SilentlyContinue | Remove-NetFirewallRule
 
 New-NetFirewallRule `
@@ -39,7 +35,7 @@ New-NetFirewallRule `
     -LocalPort 123 `
     -Action Allow `
     -Profile Any `
-    -RemoteAddress $Autorises | Out-Null
+    -RemoteAddress $Reseau | Out-Null
 
 # Pare-feu : autoriser le ping
 Enable-NetFirewallRule -DisplayName "File and Printer Sharing (Echo Request - ICMPv4-In)" -ErrorAction SilentlyContinue
